@@ -1,1 +1,1 @@
-# climate-zero
+# climate-Lowest-score wins
