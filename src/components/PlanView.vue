@@ -107,7 +107,9 @@ export default {
       item: [],
       done: "success",
       settings: null,
+      status: "yose",
       context: undefined,
+      value: [0, 2, 5, 9, 5],
       fx5: { label: "Monthly power $", val: 75, color: "green lighten-1'" },
       fx6: { label: "Monthly gas  $", val: 80, color: "green lighten-1'" },
       fx7: { label: "Monthly car miles #", val: 5, color: "green lighten-1'" },
@@ -123,6 +125,12 @@ export default {
   methods: {
 
    updateCarbon(){
+       this.value[1] = this.fx5.val;
+     this.value[2] = this.fx6.val;
+     this.value[3] = this.fx7.val;
+     this.value[4] = this.fx11.val;
+     
+      this.status = "yo";
       var power = this.fx5.val;
       var gas = this.fx6.val;
       var flights = this.fx8.val;
