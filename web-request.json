@@ -1,0 +1,614 @@
+[
+    {
+        "id": "1cc9a1b7e0f8f81c",
+        "type": "tab",
+        "label": "Feeds request",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "87bd706a.aec93",
+        "type": "comment",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "Create an HTTP Endpoint",
+        "info": "The `HTTP In` and `HTTP Response` pair of nodes are the starting point for all HTTP endpoints you create.\n\nAny flow that starts with an `HTTP In` node must have a path to an `HTTP Response` node otherwise requests will eventually timeout.\n\nThe `HTTP Response` node uses the `payload` property of messages it receives as the body of the response. Other properties can be used to further customize the response - they are covered in other recipes.\n\nThe `Template` node provides a convenient way to embed a body of content into a flow. It may be desirable to maintain such static content outside of the flow.\n\nSee Node-RED cookbook [item](https://cookbook.nodered.org/http/create-an-http-endpoint) for details.",
+        "x": 190,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "01e65c74588e9f6c",
+        "type": "sqlite",
+        "z": "1cc9a1b7e0f8f81c",
+        "mydb": "e9cfb6951eef2b45",
+        "sqlquery": "fixed",
+        "sql": "SELECT rowid, * from feed",
+        "name": "db",
+        "x": 370,
+        "y": 120,
+        "wires": [
+            [
+                "208d98a.67a01e8"
+            ]
+        ]
+    },
+    {
+        "id": "f4b66df8b52d5633",
+        "type": "debug",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 430,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "3d9bc361d6becfd3",
+        "type": "http in",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "url": "/monitor/feed",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 200,
+        "wires": [
+            [
+                "07c5f886f5e51bfc",
+                "208d98a.67a01e8"
+            ]
+        ]
+    },
+    {
+        "id": "07c5f886f5e51bfc",
+        "type": "template",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "INSERT",
+        "field": "topic",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "INSERT INTO feed VALUES ('{{payload.name}}', '{{{payload.url}}}')",
+        "output": "str",
+        "x": 360,
+        "y": 200,
+        "wires": [
+            [
+                "e0f6580b8f2d1931"
+            ]
+        ]
+    },
+    {
+        "id": "e0f6580b8f2d1931",
+        "type": "sqlite",
+        "z": "1cc9a1b7e0f8f81c",
+        "mydb": "e9cfb6951eef2b45",
+        "sqlquery": "msg.topic",
+        "sql": "SELECT * from feed",
+        "name": "db",
+        "x": 510,
+        "y": 200,
+        "wires": [
+            [
+                "01e65c74588e9f6c"
+            ]
+        ]
+    },
+    {
+        "id": "a39b79c1.6d1eb8",
+        "type": "http in",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "url": "/monitor/feed",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 120,
+        "wires": [
+            [
+                "01e65c74588e9f6c"
+            ]
+        ]
+    },
+    {
+        "id": "208d98a.67a01e8",
+        "type": "template",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "field": "template.body",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<div class=\"container\">\n    <h1>Feed</h1>\n    <div class=\"row\">\n        <div class=\"col-md-6\">\n            <table class=\"table\">\n              <thead>\n                <tr>\n                  <th scope=\"col\">Name</th>\n                  <th scope=\"col\">Url</th>\n                  <th scope=\"col\"></th>\n                </tr>\n              </thead>\n              <tbody>\n                {{#payload}}\n                <tr class=\"table-primary\">\n                  <td>{{name}}</td>\n                  <td>{{url}}</td>\n                  <td><a href=\"/monitor/feed/delete/{{rowid}}\" class=\"btn btn-outline-danger\">delete</a></td>\n                </tr>\n                {{/payload}}\n              </tbody>\n            </table> \n        </div>\n        <div class=\"col-md-6\">\n            <form method=\"POST\" action=\"/monitor/feed\">\n                <label for=\"name\">Name</label>\n                <input class=\"form-control\" id=\"name\" name=\"name\">\n                <label for=\"url\">Url</label>\n                <input class=\"form-control\" id=\"url\" name=\"url\">\n                <button type=\"submit\" class=\"btn btn-primary\">Add</button>\n            </form>\n        </div>\n    </div>\n</div>",
+        "output": "str",
+        "x": 580,
+        "y": 120,
+        "wires": [
+            [
+                "f4b66df8b52d5633",
+                "468ab205a57b1249"
+            ]
+        ]
+    },
+    {
+        "id": "36f3600a9547afe4",
+        "type": "http in",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "url": "/monitor/feed/delete/:rowid",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 260,
+        "wires": [
+            [
+                "f4b66df8b52d5633",
+                "52f03fce52390228"
+            ]
+        ]
+    },
+    {
+        "id": "52f03fce52390228",
+        "type": "template",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "DELETE",
+        "field": "topic",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "DELETE FROM feed WHERE rowid = {{req.params.rowid}}",
+        "output": "str",
+        "x": 380,
+        "y": 260,
+        "wires": [
+            [
+                "e0f6580b8f2d1931"
+            ]
+        ]
+    },
+    {
+        "id": "ee572853171fcdbb",
+        "type": "comment",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "monitor/keyword",
+        "info": "The `HTTP In` and `HTTP Response` pair of nodes are the starting point for all HTTP endpoints you create.\n\nAny flow that starts with an `HTTP In` node must have a path to an `HTTP Response` node otherwise requests will eventually timeout.\n\nThe `HTTP Response` node uses the `payload` property of messages it receives as the body of the response. Other properties can be used to further customize the response - they are covered in other recipes.\n\nThe `Template` node provides a convenient way to embed a body of content into a flow. It may be desirable to maintain such static content outside of the flow.\n\nSee Node-RED cookbook [item](https://cookbook.nodered.org/http/create-an-http-endpoint) for details.",
+        "x": 120,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "3df3084f0a386191",
+        "type": "sqlite",
+        "z": "1cc9a1b7e0f8f81c",
+        "mydb": "e9cfb6951eef2b45",
+        "sqlquery": "fixed",
+        "sql": "SELECT rowid, * from keyword",
+        "name": "db",
+        "x": 390,
+        "y": 460,
+        "wires": [
+            [
+                "a4eb67c9ea1e1e8e"
+            ]
+        ]
+    },
+    {
+        "id": "8485eb3319660219",
+        "type": "debug",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "465458c53647e91b",
+        "type": "http in",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "url": "/monitor/keyword",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 540,
+        "wires": [
+            [
+                "d36b2fed76bce0f9",
+                "a4eb67c9ea1e1e8e"
+            ]
+        ]
+    },
+    {
+        "id": "d36b2fed76bce0f9",
+        "type": "template",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "INSERT",
+        "field": "topic",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "INSERT INTO keyword VALUES ('{{payload.expression}}')",
+        "output": "str",
+        "x": 380,
+        "y": 540,
+        "wires": [
+            [
+                "7c1bd173a0d252a4"
+            ]
+        ]
+    },
+    {
+        "id": "683947cacc2bdb52",
+        "type": "http in",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "url": "/monitor/keyword",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 460,
+        "wires": [
+            [
+                "3df3084f0a386191"
+            ]
+        ]
+    },
+    {
+        "id": "a4eb67c9ea1e1e8e",
+        "type": "template",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "field": "template.body",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<div class=\"container\">\n<div class=\"row\">\n        <div class=\"col-md-6\">\n            <table class=\"table\">\n              <thead>\n                <tr>\n                  <th scope=\"col\">Expression</th>\n                  <th scope=\"col\"></th>\n                </tr>\n              </thead>\n              <tbody>\n                {{#payload}}\n                <tr class=\"table-primary\">\n                  <td>{{expression}}</td>\n                  <td><a href=\"/monitor/keyword/delete/{{rowid}}\" class=\"btn btn-outline-danger\">delete</a></td>\n                </tr>\n                {{/payload}}\n              </tbody>\n            </table> \n        </div>\n        <div class=\"col-md-6\">\n            <form method=\"POST\" action=\"/monitor/keyword\">\n                <label for=\"expression\">Expression</label>\n                <input class=\"form-control\" id=\"expression\" name=\"expression\">\n                <button type=\"submit\" class=\"btn btn-primary\">Add</button>\n            </form>\n        </div>\n    </div>\n</div>\n</div>",
+        "output": "str",
+        "x": 640,
+        "y": 460,
+        "wires": [
+            [
+                "8485eb3319660219",
+                "468ab205a57b1249"
+            ]
+        ]
+    },
+    {
+        "id": "3a685feb698c2f37",
+        "type": "http in",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "url": "/monitor/keyword/delete/:rowid",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 600,
+        "wires": [
+            [
+                "8485eb3319660219",
+                "17a32dbc54f8c698"
+            ]
+        ]
+    },
+    {
+        "id": "17a32dbc54f8c698",
+        "type": "template",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "DELETE",
+        "field": "topic",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "DELETE FROM keyword WHERE rowid = {{req.params.rowid}}",
+        "output": "str",
+        "x": 400,
+        "y": 600,
+        "wires": [
+            [
+                "7c1bd173a0d252a4"
+            ]
+        ]
+    },
+    {
+        "id": "128e5f079c4903e6",
+        "type": "comment",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "/monitor",
+        "info": "The `HTTP In` and `HTTP Response` pair of nodes are the starting point for all HTTP endpoints you create.\n\nAny flow that starts with an `HTTP In` node must have a path to an `HTTP Response` node otherwise requests will eventually timeout.\n\nThe `HTTP Response` node uses the `payload` property of messages it receives as the body of the response. Other properties can be used to further customize the response - they are covered in other recipes.\n\nThe `Template` node provides a convenient way to embed a body of content into a flow. It may be desirable to maintain such static content outside of the flow.\n\nSee Node-RED cookbook [item](https://cookbook.nodered.org/http/create-an-http-endpoint) for details.",
+        "x": 120,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "d551c79ea549577c",
+        "type": "sqlite",
+        "z": "1cc9a1b7e0f8f81c",
+        "mydb": "e9cfb6951eef2b45",
+        "sqlquery": "fixed",
+        "sql": "SELECT rowid, * from match\nORDER by rowid DESC",
+        "name": "db",
+        "x": 330,
+        "y": 780,
+        "wires": [
+            [
+                "4809c1624c13aef6"
+            ]
+        ]
+    },
+    {
+        "id": "514776cab5ec5f82",
+        "type": "http in",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "url": "/monitor",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 780,
+        "wires": [
+            [
+                "d551c79ea549577c"
+            ]
+        ]
+    },
+    {
+        "id": "4809c1624c13aef6",
+        "type": "template",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "monitor",
+        "field": "template.body",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<div class=\"container\">\n<h1>Monitor</h1>\n    <div class=\"row\">\n        <div class=\"col-md-12\">\n            <table class=\"table\">\n              <thead>\n                <tr>\n                  <th scope=\"col\">Link</th>\n                  <th scope=\"col\">Summary</th>\n                  <th scope=\"col\">Sent</th>\n                </tr>\n              </thead>\n              <tbody>\n                {{#payload}}\n                <tr class=\"table-primary\">\n                  <td><a href=\"{{link}}\">{{title}}</a></td>\n                  <td>{{description}}</td>\n                  <td>{{sent}}</td>\n                </tr>\n                {{/payload}}\n              </tbody>\n            </table> \n        </div>\n    </div>\n</div>\n</div>",
+        "output": "str",
+        "x": 560,
+        "y": 760,
+        "wires": [
+            [
+                "468ab205a57b1249"
+            ]
+        ]
+    },
+    {
+        "id": "3778aa20107a32b8",
+        "type": "http response",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 750,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "4daacf4257b50ff5",
+        "type": "http in",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "url": "/monitor",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 840,
+        "wires": [
+            [
+                "d6051e10b9548c19",
+                "bd53fc49ac137044"
+            ]
+        ]
+    },
+    {
+        "id": "1fde170c54c3b12d",
+        "type": "sqlite",
+        "z": "1cc9a1b7e0f8f81c",
+        "mydb": "e9cfb6951eef2b45",
+        "sqlquery": "msg.topic",
+        "sql": "SELECT rowid, * from match\nwhere title like '%{{payload.search}}%' \nORDER by rowid DESC",
+        "name": "db",
+        "x": 450,
+        "y": 840,
+        "wires": [
+            [
+                "53faba9f2c0b2528"
+            ]
+        ]
+    },
+    {
+        "id": "d6051e10b9548c19",
+        "type": "debug",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 270,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "bd53fc49ac137044",
+        "type": "template",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "SELECT",
+        "field": "topic",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "SELECT rowid, * from match\nwhere title like '%{{payload.search}}%'  \nORDER by rowid DESC",
+        "output": "str",
+        "x": 300,
+        "y": 840,
+        "wires": [
+            [
+                "1fde170c54c3b12d"
+            ]
+        ]
+    },
+    {
+        "id": "468ab205a57b1249",
+        "type": "template",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "navbar",
+        "field": "template.navbar",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<nav class=\"navbar navbar-expand-lg navbar-light bg-light mb-4\">\n  <div class=\"container-fluid\">\n    <a class=\"navbar-brand\" href=\"https://devpost.com/\">Climate interface</a>\n    <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarColor01\" aria-controls=\"navbarColor01\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">\n      <span class=\"navbar-toggler-icon\"></span>\n    </button>\n    <div class=\"collapse navbar-collapse\" id=\"navbarColor01\">\n      <ul class=\"navbar-nav me-auto\">\n        <li class=\"nav-item\">\n          <a class=\"nav-link active\" href=\"/monitor\">Home\n            <span class=\"visually-hidden\"></span>\n          </a>\n        </li>\n      <!--  <li class=\"nav-item\">\n          <a class=\"nav-link\" href=\"/monitor/feed\">Feed</a>-->\n        </li>\n       </ul\n       <div class=\"btn-group\" role=\"group\" aria-label=\"Button group with nested dropdown\">\n      <button type=\"button\" class=\"btn btn-success\">Cl</button>\n      <div class=\"btn-group\" role=\"group\">\n        <button id=\"btnGroupDrop2\" type=\"button\" class=\"btn btn-success dropdown-toggle show\" data-bs-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\"></button>\n        <div class=\"dropdown-menu show\" aria-labelledby=\"btnGroupDrop2\" data-popper-placement=\"bottom-start\" style=\"position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 52px);\">\n          <a class=\"dropdown-item\" href=\"/monitor/keyword\">Keywords </a>\n          <a class=\"dropdown-item\" href=\"/monitor/feed\">Feed</a>\n        </div>\n      </div>\n    </div>\n      <form method=\"POST\" action=\"/monitor\"  class=\" form-inline my - 2 my-lg- 0\">\n        <input name=\"search\" value=\"{{req.body.search}}\" class=\"form-control me-sm-2\" type=\"text\" placeholder=\"Search\">\n        <button class=\"btn btn-secondary my-2 my-sm-0\" type=\"submit\">Search</button>\n      </form>\n    </div>\n  </div>\n</nav>\n",
+        "output": "str",
+        "x": 750,
+        "y": 760,
+        "wires": [
+            [
+                "b293525ceb84363c"
+            ]
+        ]
+    },
+    {
+        "id": "b293525ceb84363c",
+        "type": "template",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "head",
+        "field": "template.head",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<script src=\"//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js\"></script>\n<script src=\"//stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js\" integrity=\"sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o\" crossorigin=\"anonymous\"></script>\n<link href=\"//stackpath.bootstrapcdn.com/bootswatch/4.3.1/slate/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-FBPbZPVh+7ks5JJ70RJmIaqyGnvMbeJ5JQfEbW0Ac6ErfvEg9yG56JQJuMNptWsH\" crossorigin=\"anonymous\">\n<link href=\"//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css\" rel=\"stylesheet\" integrity=\"sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN\" crossorigin=\"anonymous\">",
+        "output": "str",
+        "x": 750,
+        "y": 800,
+        "wires": [
+            [
+                "3d9406d20b44e86e"
+            ]
+        ]
+    },
+    {
+        "id": "3d9406d20b44e86e",
+        "type": "template",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "html",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html>\n    <head>\n        {{{template.head}}}\n    </head>\n    <body>\n        {{{template.navbar}}}\n        {{{template.body}}}\n    </body>\n</html> ",
+        "output": "str",
+        "x": 750,
+        "y": 840,
+        "wires": [
+            [
+                "3778aa20107a32b8"
+            ]
+        ]
+    },
+    {
+        "id": "8f6616699f89e742",
+        "type": "template",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "/showcase",
+        "field": "template.body",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<div class=\"row\">\n    {{#payload}}\n    <div class=\"col-sm-6 col-md-4 col-lg-2\">\n        <div class=\"card text-white {{^sent}}bg-secondary{{/sent}} m-2\" style=\"max-width: 20rem;\">\n          <div class=\"card-header\"><a href=\"{{link}}\">{{title}}</a></div>\n          <div class=\"card-body\">\n            <p class=\"card-text\">{{description}}</p>\n          </div>\n        </div>\n    </div>\n    {{/payload}}\n</div>",
+        "output": "str",
+        "x": 590,
+        "y": 920,
+        "wires": [
+            [
+                "b293525ceb84363c"
+            ]
+        ]
+    },
+    {
+        "id": "53faba9f2c0b2528",
+        "type": "switch",
+        "z": "1cc9a1b7e0f8f81c",
+        "name": "",
+        "property": "req.url",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "/monitor",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "/monitor/showcase",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "/monitor/api/match",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 3,
+        "x": 570,
+        "y": 820,
+        "wires": [
+            [
+                "4809c1624c13aef6"
+            ],
+            [],
+            [
+                "8f6616699f89e742"
+            ]
+        ]
+    },
+    {
+        "id": "7c1bd173a0d252a4",
+        "type": "sqlite",
+        "z": "1cc9a1b7e0f8f81c",
+        "mydb": "e9cfb6951eef2b45",
+        "sqlquery": "msg.topic",
+        "sql": "SELECT * from keyword",
+        "name": "db",
+        "x": 530,
+        "y": 540,
+        "wires": [
+            [
+                "3df3084f0a386191"
+            ]
+        ]
+    },
+    {
+        "id": "e9cfb6951eef2b45",
+        "type": "sqlitedb",
+        "db": "/Users/franciscosilva/Documents/mydatabase.sqlite",
+        "mode": "RWC"
+    }
+]

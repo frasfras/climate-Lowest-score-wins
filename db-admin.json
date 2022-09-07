@@ -1,0 +1,193 @@
+[
+    {
+        "id": "af523b07868711f3",
+        "type": "tab",
+        "label": "db-admin",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "7baac6848fdf0ae5",
+        "type": "inject",
+        "z": "af523b07868711f3",
+        "name": "CREATE feed ",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "CREATE TABLE feed (name,url)",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0f0eb4b6f74ce77e",
+        "type": "inject",
+        "z": "af523b07868711f3",
+        "name": "CREATE feed ",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "CREATE TABLE feed (name,url)",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "b2ccc18519d0544b"
+            ]
+        ]
+    },
+    {
+        "id": "a0564b1e09d5b1c4",
+        "type": "inject",
+        "z": "af523b07868711f3",
+        "name": "DROP feed ",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "DROP TABLE match",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 380,
+        "wires": [
+            [
+                "b2ccc18519d0544b"
+            ]
+        ]
+    },
+    {
+        "id": "276163cc9e947063",
+        "type": "comment",
+        "z": "af523b07868711f3",
+        "name": "Delete table",
+        "info": "",
+        "x": 130,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "3fb9560dfa25fbd3",
+        "type": "comment",
+        "z": "af523b07868711f3",
+        "name": "Create Table",
+        "info": "",
+        "x": 130,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "b2ccc18519d0544b",
+        "type": "sqlite",
+        "z": "af523b07868711f3",
+        "mydb": "e9cfb6951eef2b45",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "monitorDb",
+        "x": 530,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c15d9b0d8f76039e",
+        "type": "inject",
+        "z": "af523b07868711f3",
+        "name": "CREATE match",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "CREATE TABLE match (link,title,description,image, sent )",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 200,
+        "wires": [
+            [
+                "b2ccc18519d0544b"
+            ]
+        ]
+    },
+    {
+        "id": "3e5086d9ef505e45",
+        "type": "inject",
+        "z": "af523b07868711f3",
+        "name": "CREATE keyword",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "CREATE TABLE keyword (expression)",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 140,
+        "wires": [
+            [
+                "b2ccc18519d0544b"
+            ]
+        ]
+    },
+    {
+        "id": "e9cfb6951eef2b45",
+        "type": "sqlitedb",
+        "db": "/Users/franciscosilva/Documents/mydatabase.sqlite",
+        "mode": "RWC"
+    }
+]
